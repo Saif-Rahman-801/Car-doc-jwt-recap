@@ -38,18 +38,32 @@ const AuthProvider = ({ children }) => {
       setLoading(false);
 
       // If user exists send the user email to issue a token
-      const loggedUser = { email: currentUser.email };
-      axios
-        .post("http://localhost:5000/jwt", loggedUser, {
-          withCredentials: true,
-        }).then((res) => {
-          console.log("token response ",res.data);
-        });
+      const userEmail = currentUser?.email || user?.email;
+      const loggedUser = { email: userEmail };
+      if (currentUser) {
+        axios
+          .post("http://localhost:5000/jwt", loggedUser, {
+            withCredentials: true,
+          })
+          .then((res) => {
+            console.log("token response ", res.data);
+            console.log(loggedUser);
+          });
+      } else {
+        axios
+          .post("http://localhost:5000/logout", loggedUser, {
+            withCredentials: true,
+          })
+          .then((res) => {
+            console.log(loggedUser, "removed");
+            console.log(res.data);
+          });
+      }
     });
     return () => {
       return unsubscribe();
     };
-  }, []);
+  }, [user?.email]);
 
   const authInfo = {
     user,
